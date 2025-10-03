@@ -17,8 +17,8 @@ type ArticleFormParams = {
 export const ArticleParamsForm = (props: ArticleFormParams) => {
 	const { articleParams, setArticleParams } = props;
 
-	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const toggleMenu = () => setIsOpen(!isOpen);
+	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+	const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
 	const [currentParams, setCurrentParams] = useState<ArticleStateType>(articleParams);
 
@@ -40,7 +40,7 @@ export const ArticleParamsForm = (props: ArticleFormParams) => {
 
   // --- NEW: закрытие по клику вне и по Escape
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isMenuOpen) return;
 
     const handlePointerDown = (e: MouseEvent | TouchEvent) => {
       const target = e.target as Node;
@@ -50,11 +50,11 @@ export const ArticleParamsForm = (props: ArticleFormParams) => {
       // клик по стрелке/внутри её обёртки — игнор
       if (arrowWrapRef.current?.contains(target)) return;
 
-      setIsOpen(false);
+      setIsMenuOpen(false);
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false);
+      if (e.key === 'Escape') setIsMenuOpen(false);
     };
 
     document.addEventListener('mousedown', handlePointerDown);
@@ -66,15 +66,15 @@ export const ArticleParamsForm = (props: ArticleFormParams) => {
       document.removeEventListener('touchstart', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen]);
+  }, [isMenuOpen]);
 
 	return (
 		<>
 			<div ref={arrowWrapRef}>
-        <ArrowButton isOpen={isOpen} onClick={toggleMenu} />
+        <ArrowButton isOpen={isMenuOpen} onClick={toggleMenu} />
       </div>
-			<aside ref={asideRef} className={`${styles.container} ${isOpen ? styles.container_open : ''}`} aria-hidden={!isOpen}>
-				<form className={styles.form} onSubmit={(e) => e.preventDefault()}>
+			<aside ref={asideRef} className={`${styles.container} ${isMenuOpen ? styles.container_open : ''}`} aria-hidden={!isMenuOpen}>
+				<form className={styles.form} onSubmit={(e) => { e.preventDefault(); submitStyles(); }} onReset={() => resetStyles()}>
 					<Text weight={800} size={31} uppercase={true}>Задайте параметры</Text>
 					<Select options={fontFamilyOptions} selected={currentParams.fontFamilyOption} title={"Шрифт"} onChange={(v) => setStyle('fontFamilyOption', v)} />
 					<RadioGroup options={fontSizeOptions} title={"Размер шрифта"} selected={currentParams.fontSizeOption} name={"font-size"} onChange={(v) => setStyle('fontSizeOption', v)} />
@@ -84,8 +84,8 @@ export const ArticleParamsForm = (props: ArticleFormParams) => {
 					<Select options={contentWidthArr} selected={currentParams.contentWidth} title={"Ширина контента"} onChange={(v) => setStyle('contentWidth', v)} />
 
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' htmlType='reset' type='clear' onClick={resetStyles} />
-						<Button title='Применить' htmlType='submit' type='apply' onClick={submitStyles} />
+						<Button title='Сбросить'  htmlType='reset'  type='clear' />
+						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>
 			</aside>
